@@ -1,11 +1,540 @@
-<?php
-	if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
-		$uri = 'https://';
-	} else {
-		$uri = 'http://';
-	}
-	$uri .= $_SERVER['HTTP_HOST'];
-	header('Location: '.$uri.'/dashboard/');
-	exit;
-?>
-Something is wrong with the XAMPP installation :-(
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام الكلية التقنية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 3.5rem;
+            color: #eab308;
+            margin-bottom: 15px;
+        }
+        
+        .logo h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 14px 45px 14px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        
+        .input-with-icon input:focus {
+            border-color: #eab308;
+            box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #eab308;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #fbbf24;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #cbd5e1;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+            min-width: 100px;
+        }
+        
+        .role-btn:hover {
+            background: #334155;
+        }
+        
+        .role-btn.active {
+            background: #eab308;
+            color: #000;
+            border-color: #eab308;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        
+        .back-link a:hover {
+            color: #eab308;
+        }
+        
+        .system-check {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+        }
+        
+        .check-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .check-label {
+            color: #94a3b8;
+        }
+        
+        .check-value {
+            font-weight: bold;
+        }
+        
+        .check-value.online {
+            color: #22c55e;
+        }
+        
+        .check-value.offline {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <i class="fas fa-lock"></i>
+                <h1>تسجيل الدخول</h1>
+                <p>النظام السحابي لإدارة الكلية التقنية</p>
+            </div>
+            
+            <div class="alert" id="errorAlert"></div>
+            <div class="alert" id="successAlert"></div>
+            
+            <div class="role-selector" id="roleSelector">
+                <div class="role-btn active" data-role="admin">
+                    <i class="fas fa-user-shield"></i>
+                    مسؤول النظام
+                </div>
+                <div class="role-btn" data-role="registrar">
+                    <i class="fas fa-id-card-alt"></i>
+                    مكتب المسجل
+                </div>
+                <div class="role-btn" data-role="accountant">
+                    <i class="fas fa-calculator"></i>
+                    مكتب الحسابات
+                </div>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> اسم المستخدم</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" required placeholder="أدخل اسم المستخدم">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required placeholder="أدخل كلمة المرور">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    تسجيل الدخول
+                </button>
+            </form>
+            
+            <div class="system-check">
+                <div class="check-item">
+                    <span class="check-label">حالة الاتصال بالخادم:</span>
+                    <span class="check-value" id="serverStatus">جاري الفحص...</span>
+                </div>
+                <div class="check-item">
+                    <span class="check-label">واجهة API:</span>
+                    <span class="check-value" id="apiStatus">جاري الفحص...</span>
+                </div>
+                <div class="check-item">
+                    <span class="check-label">نقطة نهاية تسجيل الدخول:</span>
+                    <span class="check-value" id="loginEndpointStatus">غير محدد</span>
+                </div>
+            </div>
+            
+            <div class="back-link">
+                <a href="index.php"><i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // تعريف بيانات المستخدمين الافتراضية (للطوارئ إذا فشل API)
+        const defaultCredentials = {
+            admin: { username: 'admin', password: 'admin123', role: 'admin', name: 'مدير النظام' },
+            registrar: { username: 'registrar', password: 'registrar2024', role: 'registrar', name: 'موظف التسجيل' },
+            accountant: { username: 'accountant', password: 'accountant2024', role: 'accountant', name: 'محاسب' }
+        };
+        
+        let selectedRole = 'admin';
+        
+        // إدارة اختيار الدور
+        document.querySelectorAll('.role-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedRole = this.dataset.role;
+                
+                // تعبئة الحقول تلقائياً
+                const creds = defaultCredentials[selectedRole];
+                document.getElementById('username').value = creds.username;
+                document.getElementById('password').value = creds.password;
+            });
+        });
+        
+        // تعبئة بيانات المسؤول عند التحميل
+        window.addEventListener('load', function() {
+            const creds = defaultCredentials[selectedRole];
+            document.getElementById('username').value = creds.username;
+            document.getElementById('password').value = creds.password;
+            
+            // فحص حالة النظام عند تحميل الصفحة
+            setTimeout(checkSystemStatus, 500);
+        });
+        
+        // فحص حالة النظام
+        async function checkSystemStatus() {
+            const serverStatus = document.getElementById('serverStatus');
+            const apiStatus = document.getElementById('apiStatus');
+            const loginEndpointStatus = document.getElementById('loginEndpointStatus');
+            
+            try {
+                // 1. فحص الخادم الأساسي
+                const healthResponse = await fetch('http://localhost:5000/api/health', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (healthResponse.ok) {
+                    serverStatus.textContent = 'متصل';
+                    serverStatus.className = 'check-value online';
+                    apiStatus.textContent = 'يعمل';
+                    apiStatus.className = 'check-value online';
+                } else {
+                    throw new Error('الخادم غير متاح');
+                }
+                
+                // 2. فحص نقطة نهاية تسجيل الدخول
+                try {
+                    const testLogin = await fetch('http://localhost:5000/api/auth/verify', {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (testLogin.ok) {
+                        loginEndpointStatus.textContent = 'جاهز';
+                        loginEndpointStatus.className = 'check-value online';
+                    } else {
+                        loginEndpointStatus.textContent = 'خطأ في الرد';
+                        loginEndpointStatus.className = 'check-value offline';
+                    }
+                } catch (loginError) {
+                    loginEndpointStatus.textContent = 'غير متصل';
+                    loginEndpointStatus.className = 'check-value offline';
+                }
+                
+            } catch (error) {
+                serverStatus.textContent = 'غير متصل';
+                serverStatus.className = 'check-value offline';
+                apiStatus.textContent = 'غير متوفر';
+                apiStatus.className = 'check-value offline';
+                loginEndpointStatus.textContent = 'غير متصل';
+                loginEndpointStatus.className = 'check-value offline';
+                
+                showMessage('⚠️ الخادم الخلفي غير متاح. جاري استخدام الوضع المحلي...', 'error');
+            }
+        }
+        
+        // إدارة تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            // إخفاء الرسائل السابقة
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            
+            // التحقق من الحقول
+            if (!username || !password) {
+                showMessage('يرجى إدخال اسم المستخدم وكلمة المرور', 'error');
+                return;
+            }
+            
+            // تغيير نص الزر وعرض مؤشر التحميل
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<span class="loading"></span> جاري تسجيل الدخول...';
+            loginBtn.disabled = true;
+            
+            try {
+                // محاولة الاتصال بـ API Python
+                console.log('محاولة تسجيل الدخول عبر API...');
+                
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    }),
+                    // إعداد مهلة للاتصال
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                console.log('حالة الرد:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('بيانات الرد:', data);
+                    
+                    if (data.success) {
+                        // حفظ token في localStorage
+                        if (data.token) {
+                            localStorage.setItem('auth_token', data.token);
+                        }
+                        
+                        // حفظ بيانات المستخدم
+                        localStorage.setItem('user_data', JSON.stringify(data.user));
+                        
+                        showMessage('✅ تم تسجيل الدخول بنجاح! جاري التوجيه...', 'success');
+                        
+                        // توجيه إلى لوحة التحكم بعد 2 ثانية
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.php';
+                        }, 2000);
+                    } else {
+                        throw new Error(data.message || 'بيانات الدخول غير صحيحة');
+                    }
+                } else {
+                    // إذا فشل الاتصال بـ API، استخدم التحقق المحلي
+                    console.log('استخدام التحقق المحلي...');
+                    
+                    if (defaultCredentials[username] && defaultCredentials[username].password === password) {
+                        showMessage('✅ تم تسجيل الدخول (وضع محلي)', 'success');
+                        
+                        // حفظ بيانات المستخدم في localStorage
+                        localStorage.setItem('user_data', JSON.stringify({
+                            username: username,
+                            role: defaultCredentials[username].role,
+                            name: defaultCredentials[username].name
+                        }));
+                        
+                        // توجيه إلى لوحة التحكم بعد 2 ثانية
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.php';
+                        }, 2000);
+                    } else {
+                        throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة');
+                    }
+                }
+            } catch (error) {
+                console.error('خطأ في تسجيل الدخول:', error);
+                
+                if (error.name === 'AbortError') {
+                    showMessage('❌ انتهت مهلة الاتصال بالخادم. جاري استخدام الوضع المحلي...', 'error');
+                    
+                    // استخدام التحقق المحلي
+                    if (defaultCredentials[username] && defaultCredentials[username].password === password) {
+                        showMessage('✅ تم تسجيل الدخول (وضع محلي)', 'success');
+                        localStorage.setItem('user_data', JSON.stringify({
+                            username: username,
+                            role: defaultCredentials[username].role,
+                            name: defaultCredentials[username].name
+                        }));
+                        
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.php';
+                        }, 2000);
+                    } else {
+                        showMessage('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+                    }
+                } else {
+                    showMessage('❌ ' + error.message, 'error');
+                }
+            } finally {
+                // استعادة حالة الزر الأصلية
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
+        });
+        
+        function showMessage(text, type) {
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            if (type === 'error') {
+                errorAlert.textContent = text;
+                errorAlert.className = 'alert alert-error';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+            } else {
+                successAlert.textContent = text;
+                successAlert.className = 'alert alert-success';
+                successAlert.style.display = 'block';
+                errorAlert.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
